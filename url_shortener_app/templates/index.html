@@ -1,0 +1,120 @@
+<!-- url_shortener_app/templates/index.html -->
+{% load static %} <!-- Load the static tag library -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom CSS for the sleek and minimal design with dark purple color scheme */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #241e30;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-bottom: 2px solid #9a79c0;
+            outline: none;
+            font-size: 16px;
+            background-color: #3e3757;
+            color: #fff;
+            transition: border-color 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #b980d8;
+        }
+        .input-group button {
+            background-color: #9a79c0;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        .input-group button:hover {
+            background-color: #b980d8;
+        }
+        .shortened-url-card {
+            background-color: #3e3757;
+            border-radius: 10px;
+            padding: 20px;
+            display: none; /* Hide the shortened URL card by default */
+        }
+        .shortened-url {
+            font-size: 18px;
+            margin-top: 0px;
+            text-align: center; /* Center the text on the X-axis */
+        }
+        .shortened-url a {
+            color: #b980d8;
+            text-decoration: none;
+        }
+        .shortened-url p {
+            margin: 0;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 0px;
+            max-width: 90%;
+            height: 90%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center;">
+            <img src="{% static 'urlshortener.png' %}" alt="Your Logo" class="logo">
+        </h1>
+        <div class="input-group">
+            <input type="text" name="original_url" id="original_url" placeholder="Enter the long URL">
+            <button onclick="submitForm()">Shorten URL</button>
+        </div>
+        <div class="shortened-url-card" id="shortened_url_card">
+            <div class="shortened-url">
+                <p>Your shortened URL:</p>
+                <a href="#" id="short_url_link" target="_blank"></a>
+            </div>
+        </div>
+    </div>
+    <script>
+        function submitForm() {
+            var originalUrl = document.getElementById('original_url').value;
+            if (originalUrl.trim() === '') {
+                return;
+            }
+
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: 'original_url=' + encodeURIComponent(originalUrl),
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('short_url_link').textContent = data;
+                document.getElementById('short_url_link').href = data;
+                document.getElementById('shortened_url_card').style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>
